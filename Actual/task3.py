@@ -39,12 +39,9 @@ colours = ["r", "g", "darkgreen", "c", "m", "y", "orange", "b", "indigo", "gray"
 # These are the values we calculated for the percent of workers that can
 # work from home in each sector
 sectorProportion = [0.31, 0.21, 0.013, 0.843, 0.783, 0.71, 0.355, 0.34, 0.563, 0.467]
-# Open the csv file for Data set 1 - liverpool in this case
-total = 0
 places = ["seattle", "omaha", "scranton", "barry", "liverpool"]
 expectedHome = []
 for city in ["seattle", "omaha", "scranton", "barry", "liverpool"]:
-    total = 0
     data = []
     expectedHome.append([])
     with open(f"{city}.csv") as csvfile:
@@ -96,50 +93,21 @@ for city in ["seattle", "omaha", "scranton", "barry", "liverpool"]:
             predictedY.append(round(b * predictedX[year] + a, 5))
             # Add the people in this sector that can work from home to the final value
             final[year] += predictedY[-1] * sectorProportion[yValues[0].index(set)]
-        # Plot the actual number of people working in each sector for each year
-        # plt.plot(xValues, set[1:], "-", color = f"{colours[count]}", label = set[0])
-        # Plot the predicted number of people working in each sector for each year
-        # plt.plot(predictedX, predictedY, "--", color=f"{colours[count]}")
-    # plt.xlabel("Year")
-    # plt.ylabel("Population Working in this sector")
-    # plt.title("Number of people working in a sector over time in Seattle, Washington")
-    # This displays the key using the label of each plot which is the name of the sector from the file
-    # plt.legend()
-    #plt.show()
 
     # Number of people ready to work from home / Total people working = % of working people ready to work from home
     for x in range(len(final)):
         final[x] /= predictedPopulations[x] / 100
 
-    # Plot the working population over time and the predicted working population over time (predicted is a dashed line)
-    #plt.plot(xValues, yearPopulations, "r-")
-    #plt.plot(predictedX, predictedPopulations, "r--")
-    #plt.xlabel("Year")
-    #plt.ylabel("Population")
-    #plt.title("Expected working population in Seattle, Washington")
-    #plt.show()
-
-    # Plot the % of the working population that can work from home over time
-    #plt.plot(predictedX, final, "k--")
-    #plt.plot([2020, 2024, 2027], [final[20], final[24], final[27]], "ro")
-    #plt.xlabel("Year")
-    #plt.ylabel("% of Population")
-    #plt.title("% working population that are ready to work from home in Seattle, Washington")
-
-    # return the values of for the years 2024 and 2027
-    #print(final[20])
-    total += final[20]
-    #plt.show()
-    #average = total / 5
-    proportion = (37629 / 146254 * 100) / total * 100
-    #print(final[24])
-    #print(proportion)
-
+    # Percentage of people working from home in 2020 / predicted % of jobs that are remote ready in 2020
+    proportion = (37629 / 146254 * 100) / final[20] * 100
+    # Calculate the expected % of people working from home each year after 2022 up to 2030
     for item in final[22:]:
         expectedHome[-1].append(round(item * proportion / 100, 2))
 
 
-
+# Read in the values from spreadsheet 4 for the % of people working exclusively from home
+# data[0] = years
+# data[1] = % of people working exclusively from home
 data = [[], []]
 with open("expected.csv") as csvfile:
     fileReader = csv.reader(csvfile, delimiter=",")
@@ -150,13 +118,12 @@ with open("expected.csv") as csvfile:
         except ValueError:
             pass
 
-
-
-
+# Plot these values from 2000 to 2021
 plt.xlabel("Year")
-plt.ylabel("% of Population working from homw")
+plt.ylabel("% of Population working from home")
 plt.title("% working population expected to work from home")
 plt.plot(data[0], data[1], "r-", label="Known Percent of workers working from home")
+# Plot the expected % of people working from home for each region
 for x in range(5):
     plt.plot(np.arange(2022, 2030, 1), expectedHome[x], "--", color = colours[x], label=places[x])
 plt.legend()
